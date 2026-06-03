@@ -147,14 +147,27 @@ async def tts(payload: TTSRequest):
         raise HTTPException(status_code=502, detail=str(exc))
 
 # Serve React build when deployed as one Railway service.
-frontend_dist = os.path.abspath(os.path.join(os.getcwd(), "frontend_dist"))
-assets_dir = os.path.join(frontend_dist, "assets")
-if os.path.isdir(assets_dir):
-    app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+# Serve React build when deployed as one Railway service.
+from pathlib import Path
+
+frontend_dist = Path(__file__).resolve().parents[2] / "frontend_dist"
+assets_dir = frontend_dist / "assets"
+
+if assets_dir.exists():
+    app.mount(
+        "/assets",
+        StaticFiles(directory=str(assets_dir)),
+        name="assets",
+    )
 
 @app.get("/{full_path:path}")
 async def serve_react_app(full_path: str):
-    index_path = os.path.join(frontend_dist, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    raise HTTPException(status_code=404, detail="Frontend build not found. Run npm run build or use dev server.")
+    index_path = frontend_dist / "index.html"
+
+    if index_path.exists():
+        return FileResponse(str(index_path))
+
+    raise HTTPException(
+        status_code=404,
+        detail="Frontend build not found. Run npm run build or use dev server.",
+    )
