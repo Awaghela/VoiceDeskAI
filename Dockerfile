@@ -1,8 +1,13 @@
-FROM node:20 AS frontend-build
+FROM node:20-bookworm-slim AS frontend-build
+
 WORKDIR /frontend
-COPY frontend/package*.json ./
-RUN npm install --include=dev
+
+COPY frontend/package.json ./
+
+RUN npm install --include=dev --no-audit --no-fund
+
 COPY frontend/ ./
+
 RUN npm run build
 
 FROM python:3.11-slim
