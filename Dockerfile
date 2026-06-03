@@ -4,8 +4,6 @@ WORKDIR /frontend
 
 COPY frontend/package.json ./
 
-COPY --from=frontend-build /frontend/dist ./frontend_dist
-
 RUN npm install --include=dev --no-audit --no-fund
 
 COPY frontend/ ./
