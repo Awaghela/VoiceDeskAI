@@ -4,6 +4,8 @@ WORKDIR /frontend
 
 COPY frontend/package.json ./
 
+COPY --from=frontend-build /frontend/dist ./frontend_dist
+
 RUN npm install --include=dev --no-audit --no-fund
 
 COPY frontend/ ./
@@ -22,4 +24,4 @@ COPY --from=frontend-build /frontend/dist ./frontend_dist
 
 ENV PORT=8000
 
-CMD sh -c "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+CMD sh -c "cd backend && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
